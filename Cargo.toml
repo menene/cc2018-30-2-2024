@@ -1,5 +1,5 @@
 [package]
-name = "sr_01_point"
+name = "sr_02_line"
 version = "0.1.0"
 edition = "2021"
 
