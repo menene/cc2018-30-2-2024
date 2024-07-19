@@ -1,43 +1,35 @@
-mod framebuffer;
-mod line;
-mod polygon;
-mod bmp;
+extern crate nalgebra_glm as glm;
 
-use crate::framebuffer::Framebuffer;
-use crate::line::Line;
-use crate::polygon::Polygon;
-use crate::bmp::WriteBmp;
+use glm::Vec3;
 
 fn main() {
-    let mut framebuffer = Framebuffer::new(800, 600);
+    let v1 = Vec3::new(1.0, 2.0, 3.0);
+    let v2 = Vec3::new(4.0, 5.0, 6.0);
 
-    framebuffer.set_background_color(0x000000);
-    framebuffer.clear();
+    println!("v1: ({}, {}, {})", v1.x, v1.y, v1.z);
+    println!("v2: ({}, {}, {})", v2.x, v2.y, v2.z);
 
-    framebuffer.set_current_color(0xFFFFFF);
+    let sum = v1 + v2;
+    let diff = v1 - v2;
+    let scaled = v1 * 2.0;
 
-    // cuadrado
-    framebuffer.line(350, 350, 450, 350);
-    framebuffer.line(450, 350, 450, 450);
-    framebuffer.line(450, 450, 350, 450);
-    framebuffer.line(350, 450, 350, 350);
+    println!("sum: ({}, {}, {})", sum.x, sum.y, sum.z);
+    println!("diff: ({}, {}, {})", diff.x, diff.y, diff.z);
+    println!("scaled: ({}, {}, {})", scaled.x, scaled.y, scaled.z);
 
-    let poly1 = vec![
-        (165, 380), 
-        (185, 360), 
-        (180, 330), 
-        (207, 345), 
-        (233, 330),
-        (230, 360), 
-        (250, 380), 
-        (220, 385), 
-        (205, 410), 
-        (193, 383)
-    ];
+    let dot_product = v1.dot(&v2);
+    println!("dot product: {}", dot_product);
 
-    framebuffer.polygon(&poly1);
+    let cross_product = v1.cross(&v2);
+    // println!("cross product: {}", cross_product);
+    println!("cross_product: ({}, {}, {})", cross_product.x, cross_product.y, cross_product.z);
 
-    let _ = framebuffer.render_buffer("output.bmp");
+    let magnitude = v1.magnitude();
+    println!("magnitude: {}", magnitude);
 
-    println!("Framebuffer rendered to output.bmp");
+    let normalized = v1.normalize();
+    println!("normalized: ({}, {}, {})", normalized.x, normalized.y, normalized.z);
+
+    let magnitude_normalized = normalized.magnitude();
+    println!("magnitude normalized: {}", magnitude_normalized);
 } 
