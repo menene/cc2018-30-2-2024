@@ -1,9 +1,11 @@
 mod framebuffer;
 mod line;
+mod polygon;
 mod bmp;
 
 use crate::framebuffer::Framebuffer;
 use crate::line::Line;
+use crate::polygon::Polygon;
 use crate::bmp::WriteBmp;
 
 fn main() {
@@ -14,11 +16,26 @@ fn main() {
 
     framebuffer.set_current_color(0xFFFFFF);
 
-    framebuffer.line(100, 100, 700, 500);
-    framebuffer.line(700, 100, 100, 500);
-    framebuffer.line(400, 50, 400, 550);
-    framebuffer.line(50, 300, 750, 300);
-    framebuffer.point(0,0);
+    // cuadrado
+    framebuffer.line(350, 350, 450, 350);
+    framebuffer.line(450, 350, 450, 450);
+    framebuffer.line(450, 450, 350, 450);
+    framebuffer.line(350, 450, 350, 350);
+
+    let poly1 = vec![
+        (165, 380), 
+        (185, 360), 
+        (180, 330), 
+        (207, 345), 
+        (233, 330),
+        (230, 360), 
+        (250, 380), 
+        (220, 385), 
+        (205, 410), 
+        (193, 383)
+    ];
+
+    framebuffer.polygon(&poly1);
 
     let _ = framebuffer.render_buffer("output.bmp");
 
