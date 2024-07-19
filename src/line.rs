@@ -1,26 +1,26 @@
 use crate::framebuffer::Framebuffer;
+use nalgebra_glm::Vec3;
 
 pub trait Line {
-    fn line(&mut self, x1: usize, y1: usize, x2: usize, y2: usize);
+    fn line(&mut self, start: Vec3, end: Vec3);
 }
 
 impl Line for Framebuffer {
-    fn line(&mut self, x1: usize, y1: usize, x2: usize, y2: usize) {
-        let dx = (x2 as i32 - x1 as i32).abs();
-        let dy = -(y2 as i32 - y1 as i32).abs();
+    fn line(&mut self, start: Vec3, end: Vec3) {
+        let dx = (end.x as i32 - start.x as i32).abs();
+        let dy = -(end.y as i32 - start.y as i32).abs();
 
-        let sx = if x1 < x2 { 1 } else { -1 };
-        let sy = if y1 < y2 { 1 } else { -1 };
+        let sx = if start.x < end.x { 1 } else { -1 };
+        let sy = if start.y < end.y { 1 } else { -1 };
         
         let mut err = dx + dy;
 
-        let mut x = x1 as i32;
-        let mut y = y1 as i32;
+        let mut current = start.map(|x| x as i32);
 
         loop {
-            self.point(x as usize, y as usize);
+            self.point(current.x as usize, current.y as usize);
 
-            if x == x2 as i32 && y == y2 as i32 {
+            if current == end.map(|x| x as i32) {
                 break;
             }
 
@@ -28,12 +28,12 @@ impl Line for Framebuffer {
             
             if e2 >= dy {
                 err += dy;
-                x += sx;
+                current.x += sx;
             }
             
             if e2 <= dx {
                 err += dx;
-                y += sy;
+                current.y += sy;
             }
         }
     }
