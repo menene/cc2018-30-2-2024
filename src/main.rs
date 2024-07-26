@@ -1,48 +1,49 @@
 extern crate nalgebra_glm as glm;
 
+use minifb::{ Window, WindowOptions, Key };
+
 use glm::Vec3;
 
 mod framebuffer;
 mod line;
 mod polygon;
-mod bmp;
 
 use crate::framebuffer::Framebuffer;
-use crate::line::Line;
 use crate::polygon::Polygon;
-use crate::bmp::WriteBmp;
 
 fn main() {
-    let mut framebuffer = Framebuffer::new(800, 600);
+    let window_width = 800;
+    let window_height = 600;
+    let framebuffer_width = 80;
+    let framebuffer_height = 60;
+
+    let mut framebuffer = Framebuffer::new(framebuffer_width, framebuffer_height);
+
+    let mut window = Window::new(
+        "UVG Graphixs",
+        window_width,
+        window_height,
+        WindowOptions::default(),
+    ).unwrap();
 
     framebuffer.set_background_color(0x000000);
     framebuffer.clear();
 
     framebuffer.set_current_color(0xFFFFFF);
 
-    let v1 = Vec3::new(100.0, 100.0, 0.0);
-    let v2 = Vec3::new(700.0, 500.0, 0.0);
-    framebuffer.line(v1, v2);
+    framebuffer.point(1, 1);
 
-
-    // let points = vec![
-    //     Vec3::new(10.0, 10.0, 0.0),
-    //     Vec3::new(80.0, 10.0, 0.0),
-    //     Vec3::new(50.0, 90.0, 0.0),
-    // ];
     let points = vec![
-        Vec3::new(165.0, 380.0, 0.0), 
-        Vec3::new(185.0, 360.0, 0.0), 
-        Vec3::new(180.0, 330.0, 0.0), 
-        Vec3::new(207.0, 345.0, 0.0), 
-        Vec3::new(233.0, 330.0, 0.0),
-        Vec3::new(230.0, 360.0, 0.0), 
-        Vec3::new(250.0, 380.0, 0.0), 
-        Vec3::new(220.0, 385.0, 0.0), 
-        Vec3::new(205.0, 410.0, 0.0), 
-        Vec3::new(193.0, 383.0, 0.0)
+        Vec3::new(30.0, 20.0, 0.0),
+        Vec3::new(50.0, 20.0, 0.0),
+        Vec3::new(50.0, 40.0, 0.0),
+        Vec3::new(30.0, 40.0, 0.0),
     ];
-    framebuffer.filled_polygon(&points);
+    framebuffer.polygon(&points);
 
-    let _ = framebuffer.render_buffer("output.bmp");
+    while window.is_open() && !window.is_key_down(Key::Escape) {
+        window
+            .update_with_buffer(&framebuffer.buffer, framebuffer_width, framebuffer_height)
+            .unwrap();
+    }
 }   
