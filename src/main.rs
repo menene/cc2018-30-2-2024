@@ -1,15 +1,10 @@
-extern crate nalgebra_glm as glm;
 
 use minifb::{ Window, WindowOptions, Key };
-
-use glm::Vec3;
+use std::time::Duration;
 
 mod framebuffer;
-mod line;
-mod polygon;
 
 use crate::framebuffer::Framebuffer;
-use crate::polygon::Polygon;
 
 fn main() {
     let window_width = 800;
@@ -27,23 +22,46 @@ fn main() {
     ).unwrap();
 
     framebuffer.set_background_color(0x000000);
-    framebuffer.clear();
+
+    let mut x = 1 as i32;
+    let mut speed = 1 as i32;
+    let mut y = 1 as i32;
+    let mut speedy = 1 as i32;
+    let frame_delay = Duration::from_millis(16);
 
     framebuffer.set_current_color(0xFFFFFF);
 
-    framebuffer.point(1, 1);
-
-    let points = vec![
-        Vec3::new(30.0, 20.0, 0.0),
-        Vec3::new(50.0, 20.0, 0.0),
-        Vec3::new(50.0, 40.0, 0.0),
-        Vec3::new(30.0, 40.0, 0.0),
-    ];
-    framebuffer.polygon(&points);
-
     while window.is_open() && !window.is_key_down(Key::Escape) {
+
+        if x as usize >= framebuffer_width {
+            framebuffer.set_current_color(0xF17102);
+            speed = -1;
+        }
+
+        if x as usize <= 0 {
+            framebuffer.set_current_color(0x00FF00);
+            speed = 1;
+        }
+
+        x += speed;
+
+        if y as usize >= framebuffer_height {
+            speedy = -1;
+        }
+
+        if y as usize <= 0 {
+            speedy = 1;
+        }
+
+        y += speedy;
+
+        framebuffer.clear();
+        framebuffer.point(x as usize, y as usize);
+
         window
             .update_with_buffer(&framebuffer.buffer, framebuffer_width, framebuffer_height)
             .unwrap();
+
+        std::thread::sleep(frame_delay);
     }
 }   
