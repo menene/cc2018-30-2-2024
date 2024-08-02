@@ -43,7 +43,14 @@ fn render(framebuffer: &mut Framebuffer, player: &Player) {
     framebuffer.point(player.pos.x as usize, player.pos.y as usize);
 
     // cast ray
-    cast_ray(framebuffer, &maze, &player, player.a, block_size);
+    // cast_ray(framebuffer, &maze, &player, player.a, block_size);
+    let num_rays = 5;
+    for i in 0..num_rays {
+        let current_ray = i as f32 / num_rays as f32;
+        let a = player.a - (player.fov / 2.0) + (player.fov * current_ray);
+
+        cast_ray(framebuffer, &maze, &player, a, block_size);
+    }
 }
 
 fn main() {
@@ -67,6 +74,7 @@ fn main() {
     let player = Player {
         pos: Vec2::new(150.0, 150.0),
         a: PI / 3.0,
+        fov: PI / 3.0
     };
 
     while window.is_open() && !window.is_key_down(Key::Escape) {

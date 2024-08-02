@@ -17,7 +17,7 @@ pub fn cast_ray(framebuffer: &mut Framebuffer, maze: &Vec<Vec<char>>, player: &P
         let i = x / block_size;
         let j = y / block_size;
 
-        if maze[i][j] != ' ' {
+        if maze[j][i] != ' ' {
             return;
         }
 
