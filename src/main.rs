@@ -23,9 +23,12 @@ fn main() {
 
     framebuffer.set_background_color(0x000000);
 
-    let mut x = 1 as i32;
+    let mut x = 0 as i32;
+    let mut x2 = 1 as i32;
+    let mut x3 = 2 as i32;
+
     let mut speed = 1 as i32;
-    let mut y = 1 as i32;
+    let mut y = 40 as i32;
     let mut speedy = 1 as i32;
     let frame_delay = Duration::from_millis(16);
 
@@ -33,7 +36,7 @@ fn main() {
 
     while window.is_open() && !window.is_key_down(Key::Escape) {
 
-        if x as usize >= framebuffer_width {
+        if x3 as usize >= framebuffer_width {
             framebuffer.set_current_color(0xF17102);
             speed = -1;
         }
@@ -44,6 +47,8 @@ fn main() {
         }
 
         x += speed;
+        x2 += speed;
+        x3 += speed;
 
         if y as usize >= framebuffer_height {
             speedy = -1;
@@ -57,6 +62,8 @@ fn main() {
 
         framebuffer.clear();
         framebuffer.point(x as usize, y as usize);
+        framebuffer.point(x2 as usize, y as usize);
+        framebuffer.point(x3 as usize, y as usize);
 
         window
             .update_with_buffer(&framebuffer.buffer, framebuffer_width, framebuffer_height)
