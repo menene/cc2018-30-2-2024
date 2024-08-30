@@ -3,16 +3,18 @@ mod framebuffer;
 mod ray_intersect;
 mod sphere;
 mod color;
-
+mod camera;
 
 use minifb::{ Window, WindowOptions, Key };
 use nalgebra_glm::{Vec3, normalize};
 use std::time::Duration;
+use std::f32::consts::PI;
 
 use crate::color::Color;
 use crate::ray_intersect::{Intersect, RayIntersect, Material};
 use crate::sphere::Sphere;
 use crate::framebuffer::Framebuffer;
+use crate::camera::Camera;
 
 pub fn cast_ray(ray_origin: &Vec3, ray_direction: &Vec3, objects: &[Sphere]) -> Color {
     let mut intersect = Intersect::empty();
@@ -35,21 +37,25 @@ pub fn cast_ray(ray_origin: &Vec3, ray_direction: &Vec3, objects: &[Sphere]) -> 
     diffuse
 }
 
-pub fn render(framebuffer: &mut Framebuffer, objects: &[Sphere]) {
+pub fn render(framebuffer: &mut Framebuffer, objects: &[Sphere], camera: &Camera) {
     let width = framebuffer.width as f32;
     let height = framebuffer.height as f32;
     let aspect_ratio = width / height;
+    let fov = PI/3.0;
+    let perspective_scale = (fov * 0.5).tan();
 
     for y in 0..framebuffer.height {
         for x in 0..framebuffer.width {
             let screen_x = (2.0 * x as f32) / width - 1.0;
             let screen_y = -(2.0 * y as f32) / height + 1.0;
 
-            let screen_x = screen_x * aspect_ratio;
+            let screen_x = screen_x * aspect_ratio * perspective_scale;
+            let screen_y = screen_y * perspective_scale;
 
             let ray_direction = normalize(&Vec3::new(screen_x, screen_y, -1.0));
+            let rotated_direction = camera.base_change(&ray_direction);
 
-            let pixel_color = cast_ray(&Vec3::new(0.0, 0.0, 0.0), &ray_direction, objects);
+            let pixel_color = cast_ray(&camera.eye, &rotated_direction, objects);
 
             framebuffer.set_current_color(pixel_color.to_hex());
             framebuffer.point(x, y);
@@ -67,7 +73,7 @@ fn main() {
     let mut framebuffer = Framebuffer::new(framebuffer_width, framebuffer_height);
 
     let mut window = Window::new(
-        "Materials",
+        "Lakitu",
         window_width,
         window_height,
         WindowOptions::default(),
@@ -94,9 +100,33 @@ fn main() {
         },
     ];
 
+    let mut camera = Camera::new(
+        Vec3::new(0.0, 0.0, 5.0),
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(0.0, 1.0, 0.0),
+    );
+
+    let rotation_speed = PI/10.0;
+
     while window.is_open() && !window.is_key_down(Key::Escape) {
 
-        render(&mut framebuffer, &objects);
+        if window.is_key_down(Key::Left) {
+            camera.orbit(rotation_speed, 0.0); 
+        }
+
+        if window.is_key_down(Key::Right) {
+            camera.orbit(-rotation_speed, 0.0);
+        }
+
+        if window.is_key_down(Key::Up) {
+            camera.orbit(0.0, -rotation_speed);
+        }
+
+        if window.is_key_down(Key::Down) {
+            camera.orbit(0.0, rotation_speed);
+        }
+
+        render(&mut framebuffer, &objects, &camera);
 
         window
             .update_with_buffer(&framebuffer.buffer, framebuffer_width, framebuffer_height)
