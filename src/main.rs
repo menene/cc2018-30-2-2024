@@ -83,13 +83,13 @@ fn main() {
 
     let objects = [
         Sphere {
-            center: Vec3::new(2.0, 0.0, -5.0),
+            center: Vec3::new(0.0, 0.0, -4.0),
             radius: 1.0,
             material: ivory,
         },
         Sphere {
-            center: Vec3::new(1.0, 0.0, -5.0),
-            radius: 1.0,
+            center: Vec3::new(1.5, 0.0, -5.0),
+            radius: 0.5,
             material: rubber
         },
     ];
