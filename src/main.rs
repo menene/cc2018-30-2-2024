@@ -131,7 +131,7 @@ fn main() {
     let light = Light::new(
         Vec3::new(100.0, 100.0, 10.0),
         Color::new(255, 255, 255),
-        1
+        1.0
     );
 
     let rotation_speed = PI/10.0;
