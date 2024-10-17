@@ -2,18 +2,7 @@
 use nalgebra_glm::{Vec3, dot};
 use crate::fragment::Fragment;
 use crate::vertex::Vertex;
-// use crate::line::line;
 use crate::color::Color;
-
-// pub fn triangle(v1: &Vertex, v2: &Vertex, v3: &Vertex) -> Vec<Fragment> {
-//     let mut fragments = Vec::new();
-
-//     fragments.extend(line(v1, v2));
-//     fragments.extend(line(v2, v3));
-//     fragments.extend(line(v3, v1));
-
-//     fragments
-// }
 
 pub fn calculate_bounding_box(v1: &Vec3, v2: &Vec3, v3: &Vec3) -> (i32, i32, i32, i32) {
     let min_x = v1.x.min(v2.x).min(v3.x).floor() as i32;
@@ -54,7 +43,7 @@ pub fn triangle(v1: &Vertex, v2: &Vertex, v3: &Vertex) -> Vec<Fragment> {
                 w2 >= 0.0 && w2 <= 1.0 &&
                 w3 >= 0.0 && w3 <= 1.0 {
 
-                    let normal = v1.transformed_normal;
+                    let normal = v1.transformed_normal * w1 + v2.transformed_normal * w2 + v3.transformed_normal * w3;
                     let normal = normal.normalize();
 
                     let intensity = dot(&normal, &light_dir).max(0.0);
@@ -62,7 +51,7 @@ pub fn triangle(v1: &Vertex, v2: &Vertex, v3: &Vertex) -> Vec<Fragment> {
                     let base_color = Color::new(100, 100, 100);
                     let lit_color = base_color * intensity;
 
-                    let depth = a.z;
+                    let depth = a.z * w1 + b.z * w2 + c.z * w3;
 
                     fragments.push(Fragment::new(x as f32, y as f32, lit_color, depth))
             }
