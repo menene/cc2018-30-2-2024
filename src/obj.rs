@@ -1,17 +1,16 @@
-
 use tobj;
 use nalgebra_glm::{Vec2, Vec3};
 use crate::vertex::Vertex;
 
 pub struct Obj {
-    meshes: Vec<Mesh>
+    meshes: Vec<Mesh>,
 }
 
-pub struct Mesh {
+struct Mesh {
     vertices: Vec<Vec3>,
     normals: Vec<Vec3>,
     texcoords: Vec<Vec2>,
-    indices: Vec<u32>
+    indices: Vec<u32>,
 }
 
 impl Obj {
@@ -26,23 +25,19 @@ impl Obj {
             let mesh = model.mesh;
             Mesh {
                 vertices: mesh.positions.chunks(3)
-                    .map(|v| Vec3::new(v[0], -v[1], -v[2]))
+                    .map(|v| Vec3::new(v[0], v[1], v[2]))
                     .collect(),
                 normals: mesh.normals.chunks(3)
-                    .map(|n| Vec3::new(n[0], -n[1], -n[2]))
+                    .map(|n| Vec3::new(n[0], n[1], n[2]))
                     .collect(),
                 texcoords: mesh.texcoords.chunks(2)
-                    .map(|t| Vec2::new(t[0], -t[1]))
+                    .map(|t| Vec2::new(t[0], 1.0 - t[1]))
                     .collect(),
-                indices: mesh.indices
+                indices: mesh.indices,
             }
         }).collect();
 
-        Ok(
-            Obj {
-                meshes
-            }
-        )
+        Ok(Obj { meshes })
     }
 
     pub fn get_vertex_array(&self) -> Vec<Vertex> {

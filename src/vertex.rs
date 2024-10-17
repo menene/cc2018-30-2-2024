@@ -1,4 +1,3 @@
-
 use nalgebra_glm::{Vec2, Vec3};
 use crate::color::Color;
 

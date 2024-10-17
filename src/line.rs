@@ -1,4 +1,3 @@
-
 use crate::fragment::Fragment;
 use crate::vertex::Vertex;
 use crate::color::Color;
