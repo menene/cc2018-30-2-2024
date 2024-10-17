@@ -10,10 +10,12 @@ mod obj;
 mod color;
 mod fragment;
 mod shaders;
+mod camera;
 
 use framebuffer::Framebuffer;
 use vertex::Vertex;
 use obj::Obj;
+use camera::Camera;
 use triangle::triangle;
 use shaders::vertex_shader;
 
@@ -132,12 +134,15 @@ fn main() {
 
     let mut framebuffer = Framebuffer::new(framebuffer_width, framebuffer_height);
     let mut window = Window::new(
-        "Matrix Transformation",
+        "Orbit Camera",
         window_width,
         window_height,
         WindowOptions::default(),
     )
     .unwrap();
+
+    window.set_position(500, 500);
+    window.update();
 
     framebuffer.set_background_color(0x333355);
 
@@ -147,9 +152,11 @@ fn main() {
     let scale = 1.0f32;
 
     // camera parameters
-    let mut eye = Vec3::new(0.0, 0.0, 5.0);
-    let mut center = Vec3::new(0.0, 0.0, 0.0);
-    let up = Vec3::new(0.0, 1.0, 0.0);
+    let mut camera = Camera::new(
+        Vec3::new(0.0, 0.0, 5.0),
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(0.0, 1.0, 0.0)
+    );
 
     let obj = Obj::load("assets/models/model.obj").expect("Failed to load obj");
     let vertex_arrays = obj.get_vertex_array(); 
@@ -159,12 +166,12 @@ fn main() {
             break;
         }
 
-        handle_input(&window, &mut eye, &mut center);
+        handle_input(&window, &mut camera);
 
         framebuffer.clear();
 
         let model_matrix = create_model_matrix(translation, scale, rotation);
-        let view_matrix = create_view_matrix(eye, center, up);
+        let view_matrix = create_view_matrix(camera.eye, camera.center, camera.up);
         let projection_matrix = create_perspective_matrix(window_width as f32, window_height as f32);
         let viewport_matrix = create_viewport_matrix(framebuffer_width as f32, framebuffer_height as f32);
         let uniforms = Uniforms { model_matrix, view_matrix, projection_matrix, viewport_matrix };
@@ -181,41 +188,48 @@ fn main() {
     }
 }
 
-fn handle_input(window: &Window, eye: &mut Vec3, center: &mut Vec3) {
-    let move_speed = 1.0;
-
-    // Move the center
-    if window.is_key_down(Key::W) {
-        center.y -= move_speed; // center up
-    }
-    if window.is_key_down(Key::S) {
-        center.y += move_speed; // center down
-    }
-    if window.is_key_down(Key::A) {
-        center.x -= move_speed; // center left
-    }
-    if window.is_key_down(Key::D) {
-        center.x += move_speed; // center right
-    }
-
-    // The eye
-    if window.is_key_down(Key::Up) {
-        eye.y -= move_speed; // eye up
-    }
-    if window.is_key_down(Key::Down) {
-        eye.y += move_speed; // eye down
-    }
+fn handle_input(window: &Window, camera: &mut Camera) {
+    let movement_speed = 1.0;
+    let rotation_speed = PI/50.0;
+    let zoom_speed = 0.1;
+   
+    //  camera orbit controls
     if window.is_key_down(Key::Left) {
-        eye.x -= move_speed; // eye left
+      camera.orbit(rotation_speed, 0.0);
     }
     if window.is_key_down(Key::Right) {
-        eye.x += move_speed; // eye right
+      camera.orbit(-rotation_speed, 0.0);
+    }
+    if window.is_key_down(Key::W) {
+      camera.orbit(0.0, -rotation_speed);
+    }
+    if window.is_key_down(Key::S) {
+      camera.orbit(0.0, rotation_speed);
     }
 
+    // Camera movement controls
+    let mut movement = Vec3::new(0.0, 0.0, 0.0);
+    if window.is_key_down(Key::A) {
+      movement.x -= movement_speed;
+    }
+    if window.is_key_down(Key::D) {
+      movement.x += movement_speed;
+    }
     if window.is_key_down(Key::Q) {
-        eye.z -= move_speed; // eye closer
+      movement.y += movement_speed;
     }
     if window.is_key_down(Key::E) {
-        eye.z += move_speed; // eye farther
+      movement.y -= movement_speed;
+    }
+    if movement.magnitude() > 0.0 {
+      camera.move_center(movement);
+    }
+
+    // Camera zoom controls
+    if window.is_key_down(Key::Up) {
+      camera.zoom(zoom_speed);
+    }
+    if window.is_key_down(Key::Down) {
+      camera.zoom(-zoom_speed);
     }
 }
