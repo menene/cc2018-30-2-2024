@@ -58,7 +58,7 @@ fn render(framebuffer: &mut Framebuffer, uniforms: &Uniforms, vertex_array: &[Ve
             let color = fragment.color.to_hex();
 
             framebuffer.set_current_color(color);
-            framebuffer.point(x, y);
+            framebuffer.point(x, y, fragment.depth);
         }
     }
 }
@@ -110,7 +110,7 @@ fn main() {
 
     let mut framebuffer = Framebuffer::new(framebuffer_width, framebuffer_height);
     let mut window = Window::new(
-        "3D Objects",
+        "zBuffer",
         window_width,
         window_height,
         WindowOptions::default()
@@ -156,7 +156,7 @@ fn main() {
         }
 
         if window.is_key_down(Key::Q) {
-            rotation.x -= PI / 100.0;
+            rotation.x -= PI / 10.0;
         }
 
         if window.is_key_down(Key::W) {
@@ -177,6 +177,12 @@ fn main() {
 
         if window.is_key_down(Key::Y) {
             rotation.z += PI / 10.0;
+        }
+
+        if window.is_key_down(Key::P) {
+            translation = Vec3::new(300.0, 200.0, 0.0);
+            scale = 100.0f32;
+            rotation = Vec3::new(0.0, 0.0, 0.0);
         }
 
         framebuffer.clear();
