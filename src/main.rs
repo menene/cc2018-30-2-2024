@@ -24,6 +24,7 @@ pub struct Uniforms {
     view_matrix: Mat4,
     projection_matrix: Mat4,
     viewport_matrix: Mat4,
+    time: u32
 }
 
 fn create_model_matrix(translation: Vec3, scale: f32, rotation: Vec3) -> Mat4 {
@@ -136,7 +137,7 @@ fn main() {
 
     let mut framebuffer = Framebuffer::new(framebuffer_width, framebuffer_height);
     let mut window = Window::new(
-        "Orbit Camera",
+        "Animated Fragment Shader",
         window_width,
         window_height,
         WindowOptions::default(),
@@ -162,11 +163,14 @@ fn main() {
 
     let obj = Obj::load("assets/models/model.obj").expect("Failed to load obj");
     let vertex_arrays = obj.get_vertex_array(); 
+    let mut time = 0;
 
     while window.is_open() {
         if window.is_key_down(Key::Escape) {
             break;
         }
+
+        time += 1;
 
         handle_input(&window, &mut camera);
 
@@ -176,7 +180,13 @@ fn main() {
         let view_matrix = create_view_matrix(camera.eye, camera.center, camera.up);
         let projection_matrix = create_perspective_matrix(window_width as f32, window_height as f32);
         let viewport_matrix = create_viewport_matrix(framebuffer_width as f32, framebuffer_height as f32);
-        let uniforms = Uniforms { model_matrix, view_matrix, projection_matrix, viewport_matrix };
+        let uniforms = Uniforms { 
+            model_matrix, 
+            view_matrix, 
+            projection_matrix, 
+            viewport_matrix,
+            time
+        };
 
 
         framebuffer.set_current_color(0xFFDDDD);
