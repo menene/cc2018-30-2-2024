@@ -18,13 +18,25 @@ use obj::Obj;
 use camera::Camera;
 use triangle::triangle;
 use shaders::{vertex_shader, fragment_shader};
+use fastnoise_lite::{FastNoiseLite, NoiseType, FractalType};
 
 pub struct Uniforms {
     model_matrix: Mat4,
     view_matrix: Mat4,
     projection_matrix: Mat4,
     viewport_matrix: Mat4,
-    time: u32
+    time: u32,
+    noise: FastNoiseLite
+}
+
+fn create_noise() -> FastNoiseLite {
+    create_cloud_noise()
+}
+
+fn create_cloud_noise() -> FastNoiseLite {
+    let mut noise = FastNoiseLite::with_seed(1337);
+    noise.set_noise_type(Some(NoiseType::OpenSimplex2));
+    noise
 }
 
 fn create_model_matrix(translation: Vec3, scale: f32, rotation: Vec3) -> Mat4 {
@@ -176,6 +188,7 @@ fn main() {
 
         framebuffer.clear();
 
+        let noise = create_noise();
         let model_matrix = create_model_matrix(translation, scale, rotation);
         let view_matrix = create_view_matrix(camera.eye, camera.center, camera.up);
         let projection_matrix = create_perspective_matrix(window_width as f32, window_height as f32);
@@ -185,7 +198,8 @@ fn main() {
             view_matrix, 
             projection_matrix, 
             viewport_matrix,
-            time
+            time,
+            noise
         };
 
 
