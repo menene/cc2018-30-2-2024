@@ -43,11 +43,11 @@ pub fn vertex_shader(vertex: &Vertex, uniforms: &Uniforms) -> Vertex {
 
 pub fn fragment_shader(fragment: &Fragment, uniforms: &Uniforms) -> Color {
     // fragment.color * fragment.intensity
-    // combined_shader(fragment, uniforms)
+    combined_shader(fragment, uniforms)
     // combined_blend_shader(fragment, "normal")
     // combined_blend_shader(fragment, "multiply")
     // combined_blend_shader(fragment, "add")
-    combined_blend_shader(fragment, "subtract")
+    // combined_blend_shader(fragment, "subtract")
 }
 
 fn static_pattern_shader(fragment: &Fragment) -> Color {
