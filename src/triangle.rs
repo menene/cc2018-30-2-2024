@@ -33,7 +33,19 @@ pub fn triangle(v1: &Vertex, v2: &Vertex, v3: &Vertex) -> Vec<Fragment> {
 
         let depth = a.z * w1 + b.z * w2 + c.z * w3;
 
-        fragments.push(Fragment::new(x as f32, y as f32, lit_color, depth));
+        let vertex_position = v1.position * w1 + v2.position * w2 + v3.position * w3;
+
+        fragments.push(
+            Fragment::new(
+                x as f32,
+                y as f32,
+                lit_color,
+                depth,
+                normal,
+                intensity,
+                vertex_position,
+            )
+        );
       }
     }
   }

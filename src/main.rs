@@ -17,7 +17,7 @@ use vertex::Vertex;
 use obj::Obj;
 use camera::Camera;
 use triangle::triangle;
-use shaders::vertex_shader;
+use shaders::{vertex_shader, fragment_shader};
 
 pub struct Uniforms {
     model_matrix: Mat4,
@@ -117,8 +117,10 @@ fn render(framebuffer: &mut Framebuffer, uniforms: &Uniforms, vertex_array: &[Ve
     for fragment in fragments {
         let x = fragment.position.x as usize;
         let y = fragment.position.y as usize;
+
         if x < framebuffer.width && y < framebuffer.height {
-            let color = fragment.color.to_hex();
+            let shaded_color = fragment_shader(&fragment, &uniforms);
+            let color = shaded_color.to_hex();
             framebuffer.set_current_color(color);
             framebuffer.point(x, y, fragment.depth);
         }
